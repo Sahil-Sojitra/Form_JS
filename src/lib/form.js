@@ -38,4 +38,67 @@ export default class Form {
     }
   }
 
+
+  saperateFormField(){
+    this.formData.forEach(ele=> {
+      if(ele.type === 'hidden'){
+        this.hiddenFields.push(ele);
+      }else{
+        this.fields.push(ele);
+      }
+    });
+  }
+
+  createForm(){
+    this.formEl = document.createElement('form');
+    this.formEl.noValidate = false;
+    this.container.appendChild(this.formEl);
+  }
+
+  loopingFields(){
+    this.fields.forEach(field => {
+      this.formEl.appendChild(this.loopField(field));
+    });
+  }
+
+  loopField(field){
+    let ele;
+    switch (field.type) {
+      case 'text':
+      ele=document.createElement('input');
+      ele.type = field.type;
+      this.initState(field, field.value || '');
+      break;
+
+      case 'email':
+      ele=document.createElement('input');
+      ele.type = field.type;
+      this.initState(field, field.value || '');
+      break;
+
+      case 'number':
+      ele=document.createElement('input');
+      ele.type = field.type;
+      this.initState(field, field.value || '');
+      break;
+
+      case 'tel':
+      ele=document.createElement('input');
+      ele.type = field.type;
+      this.initState(field, field.value || '');
+      break;
+
+      case 'textarea':
+      ele=document.createElement('textarea');
+      this.initState(field, field.value || '');
+      break;
+    }
+  }
+
+
+  initState(field , initialValue){
+    if(this.formState[field.name] === undefined){
+      this.formState[field.name] = initialValue;
+    }
+  }
 }
