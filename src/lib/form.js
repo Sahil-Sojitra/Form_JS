@@ -6,7 +6,7 @@ export default class Form {
     // use formData to create form
     this.formData = formData;
     // form element for storing the form in the formContainerid
-    this.formEl = null ;
+    // this.formEl = document.getElementById(formContainerId) ;
     // form state
     this.formState = {};
     // hidden type fields
@@ -23,10 +23,10 @@ export default class Form {
   initialize() {
     this.validateInputs();
     this.saperateFormField();
-    this.createForm();
     this.loopingFields();
     this.getFormDataObject();
-    // this.bindFormSubmit();
+    this.FormSubmit();
+    this.FormReset();
   }
   // validation for the form data and the container in which we add the html form
   validateInputs() {
@@ -39,119 +39,118 @@ export default class Form {
     }
   }
 
-
-  saperateFormField(){
-    this.formData.forEach(ele=> {
-      if(ele.type === 'hidden'){
+  saperateFormField() {
+    this.formData.forEach((ele) => {
+      if (ele.type === 'hidden') {
         this.hiddenFields.push(ele);
-      }else{
+      } else {
         this.fields.push(ele);
       }
     });
   }
 
-  createForm(){
-    this.formEl = document.createElement('form');
-    this.formEl.noValidate = false;
-    this.container.appendChild(this.formEl);
-  }
-
-  loopingFields(){
-    this.fields.forEach(field => {
-      const el = this.loopField(field);
-      if (el){
-      this.formEl.appendChild(el);
-      }
+  loopingFields() {
+    this.fields.forEach((field) => {
+      this.loopField(field);
     });
   }
 
-  loopField(field){
+  loopField(field) {
     let ele;
     switch (field.type) {
       case 'text':
-      ele=document.createElement('input');
-      ele.type = field.type;
-      ele.name = field.key;
-      this.initState(field, field.value || '');
-      break;
+        ele = document.createElement('input');
+        ele.type = field.type;
+        ele.name = field.key;
+        this.initState(field, field.value || '');
+
+        break;
 
       case 'email':
-      ele=document.createElement('input');
-      ele.type = field.type;
-      ele.name = field.key;
-      this.initState(field, field.value || '');
-      break;
+        ele = document.createElement('input');
+        ele.type = field.type;
+        ele.name = field.key;
+        this.initState(field, field.value || '');
+        break;
 
       case 'number':
-      ele=document.createElement('input');
-      ele.type = field.type;
-      ele.name = field.key;
-      this.initState(field, field.value || '');
-      break;
+        ele = document.createElement('input');
+        ele.type = field.type;
+        ele.name = field.key;
+        this.initState(field, field.value || '');
+        break;
 
       case 'tel':
-      ele=document.createElement('input');
-      ele.type = field.type;
-      ele.name = field.key;
-      this.initState(field, field.value || '');
-      break;
+        ele = document.createElement('input');
+        ele.type = field.type;
+        ele.name = field.key;
+        this.initState(field, field.value || '');
+        break;
 
       case 'textarea':
-      ele=document.createElement('textarea');
-      this.initState(field, field.value || '');
-      break;
+        ele = document.createElement('textarea');
+        ele.name = field.key;
+        this.initState(field, field.value || '');
+        break;
 
       case 'select':
-      ele = document.createElement('select');
-      field.options.forEach(opt => {
-        const option = document.createElement('option');
-        option.innerText = opt.innerText;
-        option.value = opt.value;
-        ele.appendChild(option);
-      }) 
-      this.initState(field, field.value || '');
-      break;
+        ele = document.createElement('select');
+        field.options.forEach((opt) => {
+          const option = document.createElement('option');
+          option.innerText = opt.innerText;
+          option.value = opt.value;
+          ele.appendChild(option);
+        });
+        this.initState(field, field.value || '');
+        break;
+
+  
 
       case 'checkbox':
         ele = document.createElement('div');
-        this.formState[field.key] = field.value || [];
-        field.options.forEach(opt => {
+
+        const key = field.key;
+        this.formState[key] = field.value||[];
+
+        field.options.forEach((opt) => {
           const input = document.createElement('input');
           input.type = 'checkbox';
+          input.name = key;
           input.value = opt.value;
-          // input.id = opt.attr.id;
-          input.name = opt.name;
+          input.id = opt.attr.id;
+          input.className = opt.attr.className;
 
-          input.addEventListener('change' , (e)=>{
-            const arr = this.formState[field.key];
-            if(e.target.checked){
+          input.addEventListener('change', (e) => {
+            const arr = field.value || [];
+            if (e.target.checked) {
               arr.push(opt.value);
+            } else {
+              field.value = arr.filter((v) => v !== opt.value);
             }
-            else this.formState[field.key] = arr.filter(v => v !== opt.value);
-            console.log(this.formState);
-          })
-          const label = document.createElement('label');
-          label.innerText = opt.innerText;
-          label.htmlFor = opt.value;
+            this.formState[key] = arr;
+          });
+
           ele.appendChild(input);
-          ele.appendChild(label);
+          ele.appendChild(document.createTextNode(opt.innerText));
         });
         break;
 
-      case 'radio' :
+      case 'radio':
         ele = document.createElement('div');
         this.formState[field.key] = field.value || '';
-        field.options.forEach(opt => {
+        field.options.forEach((opt) => {
           const input = document.createElement('input');
           input.type = 'radio';
           input.value = opt.value;
-          // input.id = opt.attr.id;
           input.name = opt.name;
+          input.id = opt.attr.id;
+          input.className = opt.attr.className;
+          input.required = opt.attr.required;
 
-          input.addEventListener('change' , (e)=>{
+          input.addEventListener('change', (e) => {
             this.formState[field.key] = e.target.value;
             console.log(this.formState);
-          })
+          });
 
           const label = document.createElement('label');
           label.innerText = opt.innerText;
@@ -161,11 +160,11 @@ export default class Form {
         });
         break;
 
-        case 'submit':
-        case 'reset':
+      case 'submit':
+      case 'reset':
         ele = document.createElement('button');
         ele.type = field.type;
-        ele.textContent = field.value;
+        ele.textContent = field.attr.value;
         break;
 
       default:
@@ -173,14 +172,16 @@ export default class Form {
     }
 
     if (field.attr) {
-      this.applyAttributes(ele, field.attr);
+      this.applyAttributes(ele, field.attr,field);
     }
-    this.bindInput(ele, field);
+    if (field) {
+      this.wrappDiv(ele, field);
+    }
+    this.getInput(ele, field);
     return ele;
   }
 
-
-  initState(field , initialValue){
+  initState(field, initialValue) {
     const k = field.key || field.name;
     if (!k) return;
 
@@ -189,31 +190,74 @@ export default class Form {
     }
   }
 
-  applyAttributes(ele, attr) {
-    if(!ele ||!attr) return;
-    else{
-    Object.entries(attr).forEach(([key, value]) => {
-      if (key.startsWith('on') && typeof value === 'function') {
-        console.log(ele[key] = value);
-      } else {
-        console.log(ele[key] = value);
-      }
-    });
+  wrappDiv(ele, field) {
+    if (field.label === undefined) {
+      this.container.appendChild(ele);
+    } else {
+      const div = document.createElement('div');
+      const label = document.createElement('label');
+      label.innerText = field.label;
+      label.htmlFor = field.key;
+      div.appendChild(label);
+      div.appendChild(ele);
+      this.container.appendChild(div);
     }
   }
 
-  bindInput(ele,field){
+  applyAttributes(ele, attr, field) {
+    if (!ele || !attr) {
+      return;
+    } else {
+      Object.entries(attr).forEach(([key, value]) => {
+        if (key.startsWith('onclick') && typeof value === 'function' && key.value === 'Submit') {
+          ele[key] = this.FormSubmit();
+        } else if (key.value === 'Reset' && key.startsWith('onclick') && typeof value === 'function') {
+          ele[key] = this.FormReset();
+        } else if (key.startsWith('onchange')) {
+          ele[key] = this.getInput(ele, field);
+        } else {
+          ele[key] = value;
+        }
+      });
+    }
+  }
+
+  getInput(ele, field) {
     const k = field.key || field.name;
     if (!k || !ele) return;
-
-    ele.addEventListener('input', e => {
+    ele.addEventListener('input', (e) => {
       this.formState[k] = e.target.value;
       console.log(this.formState);
     });
   }
 
-  getFormDataObject(){
-    console.log(this.formState); 
+  getFormDataObject() {
+    const data = this.formState;
+    this.hiddenFields.forEach((field) => {
+      if (typeof field.getValue === 'function') {
+        data[field.key] = field.getValue(data);
+      } else {
+        console.log("don't add any element ");
+      }
+    });
+    return data;
   }
 
+  FormSubmit() {
+    this.container.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = this.getFormDataObject();
+      const submitEvent = new CustomEvent('form:submit', { detail: data, bubbles: true });
+      window.dispatchEvent(submitEvent);
+    });
+  }
+
+  FormReset() {
+    this.container.addEventListener('reset', (e) => {
+      this.formState = {};
+      const data = this.formState;
+      const resetEvent = new CustomEvent('form:reset', { detail: data });
+      window.dispatchEvent(resetEvent);
+    });
+  }
 }

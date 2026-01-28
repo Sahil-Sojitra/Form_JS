@@ -12,7 +12,26 @@ class Main {
     const storage = new Storage(storageId); // storage class to access storage methods
     const tbl = new Table(tableContainerId); // table js class to create table and access its methods
     // console.log(formData, frm, storage, tbl, 'Printed all instance of the class to remove eslint error');
+    // this.communication();
+    window.addEventListener('form:submit',  (e) => {
+      const storeEvent = new CustomEvent('storeData', { detail: e.detail });
+      window.dispatchEvent(storeEvent);
+    });
+
+    if(storage.getAll().length > 0) {
+        const table_render = new CustomEvent('table:render', { detail: storage.getAll() });
+        window.dispatchEvent(table_render);
+    }
+
+
+    window.addEventListener('form:reset',  (e)=> {
+      console.log('form reset');
+      const data = e.detail;
+      const table_render = new CustomEvent('table:render', { detail: storage.getAll() });
+      window.dispatchEvent(table_render);
+    });
   }
+
 }
 //formContainerId: HTML Div element id inside of which you want to create form4
 // formContainerId -> #employeeForm of current index.html
