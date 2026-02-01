@@ -1,134 +1,93 @@
 export default class Form {
-  constructor(formContainerId, formData) {
+  constructor(formContainerId, formData , callbacks={}) {
     this.container = document.getElementById(formContainerId);
-    //Container element from HTML in which you have to add form
-    // Pass formContainerId to append form element inside of HTML DIV element
-    // use formData to create form
     this.formData = formData;
-    // form element for storing the form in the formContainerid
-    // this.formEl = document.getElementById(formContainerId) ;
-    // form state
-    this.formState = {};
-    // hidden type fields
     this.hiddenFields = [];
-    // fields which are not hidden
     this.fields = [];
+    this.editingId = null;
+
+    this.onSubmit = callbacks.onSubmit || (() => { });
+    this.onReset = callbacks.onReset || (() => { });
+    this.onUpdate = callbacks.onUpdate || (() => { });
+
 
     this.initialize();
-    // console.log('Form', formData);
   }
-  // create methods/event to create form/ reset form/ submit form, etc
 
-  // initalize the form part
   initialize() {
     this.validateInputs();
     this.saperateFormField();
     this.loopingFields();
-    this.getFormDataObject();
     this.FormSubmit();
     this.FormReset();
   }
-  // validation for the form data and the container in which we add the html form
-  validateInputs() {
-    if (!this.container) {
-      console.log('Form: container element not found');
-    }
 
-    if (!Array.isArray(this.formData)) {
-      console.log('Form: formData must be an array');
-    }
+  validateInputs() {
+    if (!this.container) console.log('Form container not found');
+    if (!Array.isArray(this.formData)) console.log('formData must be array');
   }
 
   saperateFormField() {
-    this.formData.forEach((ele) => {
-      if (ele.type === 'hidden') {
-        this.hiddenFields.push(ele);
-      } else {
-        this.fields.push(ele);
-      }
-    });
+    this.formData.forEach((f) => (f.type === 'hidden' ? this.hiddenFields.push(f) : this.fields.push(f)));
   }
 
   loopingFields() {
-    this.fields.forEach((field) => {
-      this.loopField(field);
-    });
+    this.fields.forEach((field) => this.loopField(field));
   }
 
   loopField(field) {
     let ele;
+    const key = field.key;
+
     switch (field.type) {
       case 'text':
-        ele = document.createElement('input');
-        ele.type = field.type;
-        ele.name = field.key;
-        this.initState(field, field.value || '');
-
-        break;
-
       case 'email':
-        ele = document.createElement('input');
-        ele.type = field.type;
-        ele.name = field.key;
-        this.initState(field, field.value || '');
-        break;
-
       case 'number':
-        ele = document.createElement('input');
-        ele.type = field.type;
-        ele.name = field.key;
-        this.initState(field, field.value || '');
-        break;
-
       case 'tel':
         ele = document.createElement('input');
         ele.type = field.type;
-        ele.name = field.key;
-        this.initState(field, field.value || '');
+        ele.name = key;
+        this.applyAttributes(ele, field.attr);
         break;
 
       case 'textarea':
         ele = document.createElement('textarea');
-        ele.name = field.key;
-        this.initState(field, field.value || '');
+        ele.name = key;
+
+        this.applyAttributes(ele, field.attr);
         break;
 
       case 'select':
         ele = document.createElement('select');
+        ele.name = key;
         field.options.forEach((opt) => {
           const option = document.createElement('option');
-          option.innerText = opt.innerText;
           option.value = opt.value;
+          option.innerText = opt.innerText;
           ele.appendChild(option);
         });
-        this.initState(field, field.value || '');
-        break;
 
-  
+        this.applyAttributes(ele, field.attr);
+        break;
 
       case 'checkbox':
         ele = document.createElement('div');
-
-        const key = field.key;
-        this.formState[key] = field.value||[];
-
+        ele.classList.add('checkbox_place');
         field.options.forEach((opt) => {
           const input = document.createElement('input');
           input.type = 'checkbox';
           input.name = key;
           input.value = opt.value;
-          input.id = opt.attr.id;
-          input.className = opt.attr.className;
 
-          input.addEventListener('change', (e) => {
-            const arr = field.value || [];
-            if (e.target.checked) {
-              arr.push(opt.value);
-            } else {
-              field.value = arr.filter((v) => v !== opt.value);
-            }
-            this.formState[key] = arr;
-          });
+          // input.addEventListener('change', (e) => {
+          //   const arr = this.formState[key] || (this.formState[key] = []);
+          //   if (e.target.checked) {
+          //     if (!arr.includes(opt.value)) arr.push(opt.value);
+          //   } else {
+          //     this.formState[key] = arr.filter((v) => v !== opt.value);
+          //   }
+          // });
+          this.applyAttributes(ele, field.attr);
 
           ele.appendChild(input);
           ele.appendChild(document.createTextNode(opt.innerText));
@@ -137,26 +96,20 @@ export default class Form {
 
       case 'radio':
         ele = document.createElement('div');
-        this.formState[field.key] = field.value || '';
+        ele.classList.add('radio_place');
         field.options.forEach((opt) => {
           const input = document.createElement('input');
           input.type = 'radio';
+          input.name = key;
           input.value = opt.value;
-          input.name = opt.name;
-          input.id = opt.attr.id;
-          input.className = opt.attr.className;
-          input.required = opt.attr.required;
 
-          input.addEventListener('change', (e) => {
-            this.formState[field.key] = e.target.value;
-            console.log(this.formState);
-          });
+          // input.addEventListener('change', (e) => {
+          //   this.formState[key] = e.target.value;
+          // });
+          this.applyAttributes(ele, field.attr);
 
-          const label = document.createElement('label');
-          label.innerText = opt.innerText;
-          label.htmlFor = opt.value;
           ele.appendChild(input);
-          ele.appendChild(label);
+          ele.appendChild(document.createTextNode(opt.innerText));
         });
         break;
 
@@ -166,98 +119,160 @@ export default class Form {
         ele.type = field.type;
         ele.textContent = field.attr.value;
         break;
-
-      default:
-        break;
     }
 
-    if (field.attr) {
-      this.applyAttributes(ele, field.attr,field);
-    }
-    if (field) {
-      this.wrappDiv(ele, field);
-    }
-    this.getInput(ele, field);
-    return ele;
-  }
-
-  initState(field, initialValue) {
-    const k = field.key || field.name;
-    if (!k) return;
-
-    if (this.formState[k] === undefined) {
-      this.formState[k] = initialValue;
-    }
-  }
-
-  wrappDiv(ele, field) {
-    if (field.label === undefined) {
-      this.container.appendChild(ele);
-    } else {
+    if (field.label) {
       const div = document.createElement('div');
       const label = document.createElement('label');
       label.innerText = field.label;
-      label.htmlFor = field.key;
       div.appendChild(label);
       div.appendChild(ele);
       this.container.appendChild(div);
-    }
-  }
-
-  applyAttributes(ele, attr, field) {
-    if (!ele || !attr) {
-      return;
     } else {
-      Object.entries(attr).forEach(([key, value]) => {
-        if (key.startsWith('onclick') && typeof value === 'function' && key.value === 'Submit') {
-          ele[key] = this.FormSubmit();
-        } else if (key.value === 'Reset' && key.startsWith('onclick') && typeof value === 'function') {
-          ele[key] = this.FormReset();
-        } else if (key.startsWith('onchange')) {
-          ele[key] = this.getInput(ele, field);
-        } else {
-          ele[key] = value;
-        }
-      });
+      this.container.appendChild(ele);
     }
   }
 
-  getInput(ele, field) {
-    const k = field.key || field.name;
-    if (!k || !ele) return;
-    ele.addEventListener('input', (e) => {
-      this.formState[k] = e.target.value;
-      console.log(this.formState);
+
+  updateForm(data) {
+    this.fields.forEach((field) => {
+      const value = data[field.key];
+      if (value === undefined) return;
+
+      const ele = this.container.querySelector(`[name="${field.key}"]`);
+      if (!ele) return;
+
+      switch (field.type) {
+        case 'text':
+        case 'email':
+        case 'number':
+        case 'tel':
+        case 'textarea':
+          ele.value = value;
+          break;
+
+        case 'select':
+          ele.value = value;
+          break;
+
+        case 'checkbox': {
+          console.log('updating checkbox');
+          const checkboxes = this.container.querySelectorAll(`input[name="${field.key}"]`);
+          console.log(checkboxes);
+          checkboxes.forEach((cb) => {
+            const formValue = Array.isArray(value) ? value : [];
+            cb.checked = formValue.includes(cb.value);
+          });
+
+          break;
+        }
+
+        case 'radio': {
+          const radios = this.container.querySelectorAll(`input[name="${field.key}"]`);
+          radios.forEach((r) => {
+            r.checked = r.value === value;
+          });
+          break;
+        }
+      }
+    });
+  }
+
+
+
+  applyAttributes(element, attr) {
+    if (!attr) return;
+
+    Object.keys(attr).forEach((key) => {
+      const value = attr[key];
+
+      // Skip functions (like onchange callbacks)
+      if (typeof value === 'function' || key === 'name') return;
+
+      // Handle special cases
+      if (key === 'className') {
+        element.className = value;
+      } else if (key === 'required' && value === true) {
+        element.setAttribute('required', '');
+      } else {
+        element.setAttribute(key, value);
+      }
     });
   }
 
   getFormDataObject() {
-    const data = this.formState;
+    const formData = new FormData(this.container);
+    const data = {};
+
+
+    this.fields.forEach((field) => {
+      const key = field.key;
+
+      if (field.type === 'checkbox') {
+
+        data[key] = formData.getAll(key);
+      } else if (field.type !== 'submit' && field.type !== 'reset') {
+
+        data[key] = formData.get(key) || '';
+      }
+    });
+
+
     this.hiddenFields.forEach((field) => {
       if (typeof field.getValue === 'function') {
         data[field.key] = field.getValue(data);
-      } else {
-        console.log("don't add any element ");
       }
     });
+
+    console.log(data);
     return data;
   }
+
 
   FormSubmit() {
     this.container.addEventListener('submit', (e) => {
       e.preventDefault();
+
       const data = this.getFormDataObject();
-      const submitEvent = new CustomEvent('form:submit', { detail: data, bubbles: true });
-      window.dispatchEvent(submitEvent);
+
+      if (this.editingId) {
+        data.id = this.editingId;
+        data.mode = 'update';
+      } else {
+        data.mode = 'create';
+      }
+
+      this.onSubmit(data);
+
+      this.container.reset();
+
+      this.editingId = null;
     });
   }
 
   FormReset() {
-    this.container.addEventListener('reset', (e) => {
-      this.formState = {};
-      const data = this.formState;
-      const resetEvent = new CustomEvent('form:reset', { detail: data });
-      window.dispatchEvent(resetEvent);
+    this.container.addEventListener('reset', () => {
+      this.onReset();
     });
+  }
+
+  updateFormData(data) {
+    this.editingId = data.id;
+    this.updateForm(data);
+  }
+
+  showMessage(message, type = 'success') {
+    const existingMsg = this.container.parentElement.querySelector('.form-message');
+    if (existingMsg) existingMsg.remove();
+
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `form-message form-message-${type}`;
+    msgDiv.textContent = message;
+
+    this.container.parentElement.insertBefore(msgDiv, this.container.nextSibling);
+
+    setTimeout(() => {
+      msgDiv.remove();
+    }, 3000);
   }
 }

@@ -1,48 +1,66 @@
-// formData is accessible here as we have global variable in formData.js
+
 import formData from './data/formData.js';
 import Form from './lib/form.js';
 import Storage from './lib/storage.js';
 import Table from './lib/table.js';
 
 class Main {
-  constructor(formContainerId, storageId, tableContainerId) {
-    // formContainerId, storageId, tableContainerId will be in argument of constructor
-    // start code to init and link form.js, storage.js, table.js
-    const frm = new Form(formContainerId, formData); // form js class to create form and access its methods
-    const storage = new Storage(storageId); // storage class to access storage methods
-    const tbl = new Table(tableContainerId); // table js class to create table and access its methods
-    // console.log(formData, frm, storage, tbl, 'Printed all instance of the class to remove eslint error');
-    // this.communication();
-    window.addEventListener('form:submit',  (e) => {
-      const storeEvent = new CustomEvent('storeData', { detail: e.detail });
-      window.dispatchEvent(storeEvent);
+  constructor(formContainerId, storageId, tableContainerId,callbacks={}) {
+
+    this.form = new Form(formContainerId, formData, {
+      onSubmit: (data) => {
+        if (data.mode === 'update') {
+          this.storage.update(data);
+          this.form.showMessage('Record updated successfully!', 'success');
+        }
+        else {
+          this.storage.add(data);
+          this.form.showMessage('Record added successfully!', 'success');
+        }
+      },
+      onReset: () => {
+        console.log('Form reset');
+      }
     });
 
-    if(storage.getAll().length > 0) {
-        const table_render = new CustomEvent('table:render', { detail: storage.getAll() });
-        window.dispatchEvent(table_render);
+
+    this.storage = new Storage(storageId, {
+      onDataChange: (data) => {
+        this.table.render(data);
+      }
+    });
+
+    this.table = new Table(tableContainerId,{
+      onDelete :(id) =>{
+        if(this.form.editingId === id){
+          this.form.container.reset();
+          this.form.formState = {};
+          this.form.editingId = null;
+        }
+        this.storage.delete(id);
+        this.form.showMessage('Record deleted successfully!', 'error'); 
+      },
+      onUpdate : (emp) =>{
+        this.form.updateFormData(emp);
+
+      }
+    });
+
+
+    if(this.storage.getAll().length > 0){
+      this.table.render(this.storage.getAll());
     }
 
-
-    window.addEventListener('form:reset',  (e)=> {
-      console.log('form reset');
-      const data = e.detail;
-      const table_render = new CustomEvent('table:render', { detail: storage.getAll() });
-      window.dispatchEvent(table_render);
+    window.addEventListener('storage', (e) => {
+      if (e.key === storageId) {
+        const updatedData = storage.loadFromStorage();
+        this.table.render(updatedData);
+      }
     });
   }
-
 }
-//formContainerId: HTML Div element id inside of which you want to create form4
-// formContainerId -> #employeeForm of current index.html
 
-// storageId: localStorage key for saving json  string data init
-// storageId -> 'employeeData' simple string to selected as key of localStorage
-
-//tableContainerId: HTML Div element id inside of which you want to create table
-// tableContainerId -> #tableDiv of current index.html
-
-//pass formContainerId, storageId, tableContainerId to Main(formContainerId, storageId, tableContainerId)
-// const main = new Main('formContainerId', 'storageId', 'tableContainerId');
 const main = new Main('employeeForm', 'employeeData', 'tableDiv');
-// console.log(main);
+
+
+
