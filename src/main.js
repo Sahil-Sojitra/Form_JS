@@ -5,7 +5,7 @@ import Storage from './lib/storage.js';
 import Table from './lib/table.js';
 
 class Main {
-  constructor(formContainerId, storageId, tableContainerId,callbacks={}) {
+  constructor(formContainerId, storageId, tableContainerId, callbacks = {}) {
 
     this.form = new Form(formContainerId, formData, {
       onSubmit: (data) => {
@@ -30,30 +30,31 @@ class Main {
       }
     });
 
-    this.table = new Table(tableContainerId,{
-      onDelete :(id) =>{
-        if(this.form.editingId === id){
+    this.table = new Table(tableContainerId, {
+      onDelete: (id) => {
+        if (this.form.editingId === id) {
           this.form.container.reset();
           this.form.formState = {};
           this.form.editingId = null;
         }
         this.storage.delete(id);
-        this.form.showMessage('Record deleted successfully!', 'error'); 
+        this.form.showMessage('Record deleted successfully!', 'error');
       },
-      onUpdate : (emp) =>{
+      onUpdate: (emp) => {
         this.form.updateFormData(emp);
 
       }
     });
 
 
-    if(this.storage.getAll().length > 0){
+    if (this.storage.getAll().length > 0) {
       this.table.render(this.storage.getAll());
     }
 
+    // Listen for storage changes from other tabs/windows
     window.addEventListener('storage', (e) => {
       if (e.key === storageId) {
-        const updatedData = storage.loadFromStorage();
+        const updatedData = this.storage.loadFromStorage();
         this.table.render(updatedData);
       }
     });
