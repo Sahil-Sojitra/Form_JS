@@ -9,7 +9,7 @@ class Main {
 
     this.form = new Form(formContainerId, formData, {
       onSubmit: (data) => {
-        if (data.mode === 'update') {
+        if (data.id) {
           this.storage.update(data);
           this.form.showMessage('Record updated successfully!', 'success');
         }
@@ -51,7 +51,6 @@ class Main {
       this.table.render(this.storage.getAll());
     }
 
-    // Listen for storage changes from other tabs/windows
     window.addEventListener('storage', (e) => {
       if (e.key === storageId) {
         const updatedData = this.storage.loadFromStorage();
