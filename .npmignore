@@ -1,0 +1,47 @@
+# Ignore development and example files
+examples/
+backupform.js
+Index.html
+
+# Ignore source data files (examples only)
+src/data/
+src/main.js
+src/css/
+
+# Development files
+node_modules/
+.vscode/
+.idea/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+.dist/
+*.min.js
+
+# Test files
+test/
+*.test.js
+__tests__/
+coverage/
+
+# Documentation source
+docs/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Editor
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local

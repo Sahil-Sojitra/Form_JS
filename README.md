@@ -1,26 +1,271 @@
-### To open index.html you will need live server.
+# Dynamic Form Builder JS
 
+A lightweight, flexible JavaScript library for building dynamic forms with built-in table rendering and localStorage management. Create complex forms from JSON configurations without writing HTML.
+
+## Features
+
+- ✨ **Dynamic Form Generation** - Create forms from JSON configuration
+- 📊 **Built-in Table Rendering** - Display data in sortable tables
+- 💾 **localStorage Integration** - Automatic data persistence
+- 🎯 **CRUD Operations** - Full Create, Read, Update, Delete support
+- 🎨 **Customizable** - Flexible callbacks and styling options
+- 📦 **Zero Dependencies** - Pure vanilla JavaScript
+- 🔧 **ES6 Modules** - Modern JavaScript syntax
+
+## Installation
+
+```bash
+npm install dynamic-form-builder-js
 ```
-Name: Live Server
-Id: ritwickdey.LiveServer
-Description: Launch a development local Server with live reload feature for static & dynamic pages
-Version: 5.7.9
-Publisher: Ritwick Dey
-VS Marketplace Link: https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer
+
+## Quick Start
+
+```javascript
+import { Form, Storage, Table } from 'dynamic-form-builder-js';
+
+// Define your form fields
+const formConfig = [
+  {
+    type: 'text',
+    label: 'Name',
+    key: 'name',
+    attr: {
+      required: true,
+      placeholder: 'Enter name',
+    },
+  },
+  {
+    type: 'email',
+    label: 'Email',
+    key: 'email',
+    attr: {
+      required: true,
+      placeholder: 'Enter email',
+    },
+  },
+];
+
+// Initialize Form
+const form = new Form('myFormId', formConfig, {
+  onSubmit: (data) => {
+    storage.addEmployeeData(data);
+    console.log('Form submitted:', data);
+  },
+});
+
+// Initialize Storage
+const storage = new Storage('myStorageKey', {
+  onDataChange: (data) => {
+    table.render(data);
+  },
+});
+
+// Initialize Table
+const table = new Table('myTableId', {
+  onDelete: (id) => {
+    storage.deleteEmployeeData(id);
+  },
+  onUpdate: (data) => {
+    form.updateFormData(data);
+  },
+});
+
+// Render initial data
+table.render(storage.getAllEmployeeData());
 ```
 
-### Install dependencies
+## API Reference
 
-to install go into root directory and enter following command in command prompt
+### Form Class
 
+Creates a dynamic form from JSON configuration.
+
+#### Constructor
+
+```javascript
+new Form(formContainerId, formData, callbacks);
 ```
-npm install
+
+**Parameters:**
+
+- `formContainerId` (string): ID of the container element
+- `formData` (array): Array of field configuration objects
+- `callbacks` (object): Optional callbacks
+  - `onSubmit(data)`: Called when form is submitted
+  - `onReset()`: Called when form is reset
+
+#### Field Configuration
+
+Each field object can have:
+
+```javascript
+{
+  type: 'text|email|tel|textarea|select|checkbox|radio|hidden|submit|reset',
+  label: 'Field Label',
+  key: 'fieldKey',
+  value: 'default value',
+  attr: {
+    id: 'elementId',
+    className: 'css-class',
+    placeholder: 'placeholder text',
+    required: true,
+    // ... any HTML attributes
+  },
+  options: [ // for select, checkbox, radio
+    { value: 'val1', innerText: 'Option 1', attr: { id: 'opt1', className: 'option' } }
+  ],
+  getValue: function(formData) { // for hidden fields
+    return computedValue;
+  }
+}
 ```
 
-### To check eslint error
+#### Methods
 
-Run following command in root directory
+- `updateFormData(data)` - Populate form with existing data for editing
+- `showMessage(message, type)` - Display success/error messages
+- `getFormDataObject()` - Get current form data as object
 
+#### Supported Field Types
+
+- **text, email, tel, password, number, date** - Standard input fields
+- **textarea** - Multi-line text input
+- **select** - Dropdown selection
+- **checkbox** - Multiple selections
+- **radio** - Single selection from options
+- **hidden** - Hidden fields with computed values
+- **submit, reset** - Form action buttons
+
+### Storage Class
+
+Manages data persistence using localStorage.
+
+#### Constructor
+
+```javascript
+new Storage(storageId, callbacks);
 ```
-npm run eslint
+
+**Parameters:**
+
+- `storageId` (string): localStorage key
+- `callbacks` (object): Optional callbacks
+  - `onDataChange(data)`: Called when data changes
+
+#### Methods
+
+- `getAllEmployeeData()` - Returns all stored data
+- `addEmployeeData(data)` - Add new record
+- `updateEmployeeData(data)` - Update existing record
+- `deleteEmployeeData(userId)` - Delete record by ID
+- `loadFromStorage()` - Load data from localStorage
+- `saveToStorage()` - Save data to localStorage
+
+### Table Class
+
+Renders data in a table with action buttons.
+
+#### Constructor
+
+```javascript
+new Table(tableContainerId, callbacks);
 ```
+
+**Parameters:**
+
+- `tableContainerId` (string): ID of the container element
+- `callbacks` (object): Optional callbacks
+  - `onDelete(userId)`: Called when delete button clicked
+  - `onUpdate(data)`: Called when update button clicked
+
+#### Methods
+
+- `render(data)` - Render table with provided data array
+- `formatHeaderName(key)` - Format column headers (snake_case to Title Case)
+
+## Complete Example
+
+See the [examples](./examples) folder for a full working example with:
+
+- Employee management form
+- Data table with CRUD operations
+- localStorage persistence
+- Custom styling
+
+To run the example:
+
+```bash
+cd examples
+# Open index.html with a local server (e.g., Live Server in VS Code)
+```
+
+## Hidden Fields & Computed Values
+
+You can use hidden fields to generate automatic values:
+
+```javascript
+{
+  type: 'hidden',
+  key: 'userId',
+  getValue: function(formData) {
+    // formData contains current form values
+    return formData.userId || Math.floor(100000 + Math.random() * 900000);
+  }
+}
+```
+
+## Event Handling
+
+Add event handlers to any field:
+
+```javascript
+{
+  type: 'text',
+  label: 'Name',
+  key: 'name',
+  attr: {
+    onchange: function(e, formData) {
+      console.log('Name changed:', e.target.value);
+    }
+  }
+}
+```
+
+## Styling
+
+The library adds default classes you can style:
+
+- `.default_input` - Default input styling
+- `.form-message` - Message container
+- `.form-message-success` - Success messages
+- `.form-message-error` - Error messages
+- `.radio_check_label` - Radio/checkbox labels
+
+## Browser Support
+
+Works in all modern browsers that support:
+
+- ES6 Modules
+- localStorage
+- FormData API
+
+## License
+
+MIT
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Author
+
+Your Name
+
+## Changelog
+
+### 1.0.0
+
+- Initial release
+- Form, Storage, and Table classes
+- Full CRUD support
+- localStorage integration

@@ -1,7 +1,5 @@
-import formData from './data/formData.js';
-import Form from './lib/form.js';
-import Storage from './lib/storage.js';
-import Table from './lib/table.js';
+import formData from './formData.js';
+import { Form, Storage, Table } from '../index.js';
 
 class Main {
   constructor(formContainerId, storageId, tableContainerId) {

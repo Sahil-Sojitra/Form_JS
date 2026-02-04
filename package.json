@@ -1,14 +1,41 @@
 {
-  "name": "js_template",
+  "name": "@sahil_sojitra_007/dynamic-form-builder-js",
   "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
+  "description": "A lightweight, flexible JavaScript library for building dynamic forms with built-in table rendering and localStorage management",
+  "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "eslint": "eslint ."
   },
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "form",
+    "dynamic-form",
+    "form-builder",
+    "table",
+    "crud",
+    "localstorage",
+    "vanilla-js",
+    "es6",
+    "javascript",
+    "dom"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/dynamic-form-builder-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/dynamic-form-builder-js/issues"
+  },
+  "homepage": "https://github.com/yourusername/dynamic-form-builder-js#readme",
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "src/lib/**/*.js",
+    "README.md",
+    "LICENSE"
+  ],
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "eslint": "^7.30.0",

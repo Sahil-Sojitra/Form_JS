@@ -1,11 +1,11 @@
 export default class Form {
-  constructor(formContainerId, formData , callbacks={}) {
+  constructor(formContainerId, formData, callbacks = {}) {
     this.container = document.getElementById(formContainerId);
     this.formData = formData;
     this.hiddenFields = [];
     this.fields = [];
-
     this.editingId = null;
+    this.formState = {};
 
     this.onSubmit = callbacks.onSubmit || (() => { });
     this.onReset = callbacks.onReset || (() => { });
@@ -15,44 +15,38 @@ export default class Form {
   initialize() {
     this.validateInputs();
     this.separateFormField();
-    this.loopingFields();
+    this.loopingAllInputFields();
     this.FormSubmit();
     this.FormReset();
   }
 
   validateInputs() {
-    if (!this.container) console.log('Form container not found');
-    if (!Array.isArray(this.formData)) console.log('formData must be array');
+    if (!this.container) {
+      throw new Error('Form container not found. Please provide a valid container ID.');
+    }
+    if (!Array.isArray(this.formData)) {
+      throw new Error('formData must be an array of field definitions.');
+    }
   }
 
   separateFormField() {
     this.formData.forEach((f) => (f.type === 'hidden' ? this.hiddenFields.push(f) : this.fields.push(f)));
   }
 
-  loopingFields() {
-    this.fields.forEach((field) => this.loopField(field));
+  loopingAllInputFields() {
+    this.fields.forEach((field) => this.loopOnInputField(field));
   }
 
-  loopField(field) {
+  loopOnInputField(field) {
     let ele;
     const key = field.key;
 
     switch (field.type) {
-      case 'text':
-      case 'email':
-      case 'number':
-      case 'tel':
-        ele = document.createElement('input');
-        ele.type = field.type;
-        ele.name = key;
-        this.applyAttributes(ele, field.attr);
-        break;
 
       case 'textarea':
         ele = document.createElement('textarea');
-        ele.name = key; 
+        ele.name = key;
         this.applyAttributes(ele, field.attr);
-      
         break;
 
       case 'select':
@@ -70,32 +64,42 @@ export default class Form {
 
       case 'checkbox':
         ele = document.createElement('div');
-        ele.classList.add('checkbox_place');
         const checkboxes = [];
         field.options.forEach((opt) => {
           const input = document.createElement('input');
           input.type = 'checkbox';
           input.name = key;
           input.value = opt.value;
-          this.applyAttributes(ele, field.attr);
+          input.id = opt.attr.id;
+          input.className = opt.attr.className;
           checkboxes.push(input);
           ele.appendChild(input);
-          ele.appendChild(document.createTextNode(opt.innerText));
+          const label = document.createElement('label');
+          label.classList.add('radio_check_label');
+          label.innerText = opt.innerText;
+          label.value = opt.value;
+          label.htmlFor = opt.attr.id;
+          ele.appendChild(label);
         });
 
         break;
 
       case 'radio':
         ele = document.createElement('div');
-        ele.classList.add('radio_place');
         field.options.forEach((opt) => {
           const input = document.createElement('input');
           input.type = 'radio';
           input.name = key;
           input.value = opt.value;
-          this.applyAttributes(ele, field.attr);
+          input.id = opt.attr.id;
+          input.className = opt.attr.className;
+          const label = document.createElement('label');
+          label.classList.add('radio_check_label');
+          label.innerText = opt.innerText;
+          label.value = opt.value;
+          label.htmlFor = opt.attr.id;
           ele.appendChild(input);
-          ele.appendChild(document.createTextNode(opt.innerText));
+          ele.appendChild(label);
         });
 
         break;
@@ -105,6 +109,14 @@ export default class Form {
         ele = document.createElement('button');
         ele.type = field.type;
         ele.textContent = field.attr.value;
+        this.applyAttributes(ele, field.attr);
+        break;
+
+      default:
+        ele = document.createElement('input');
+        ele.type = field.type;
+        ele.name = key;
+        this.applyAttributes(ele, field.attr);
         break;
     }
 
@@ -129,13 +141,6 @@ export default class Form {
       if (!ele) return;
 
       switch (field.type) {
-        case 'text':
-        case 'email':
-        case 'number':
-        case 'tel':
-        case 'textarea':
-          ele.value = value;
-          break;
 
         case 'select':
           ele.value = value;
@@ -160,24 +165,32 @@ export default class Form {
           });
           break;
         }
+
+        default: {
+          ele.value = value;
+          break;
+        }
       }
     });
   }
 
 
-
   applyAttributes(element, attr) {
     if (!attr) return;
+    if (!attr.className) {
+      element.className = 'default_input';
+    }
 
     Object.keys(attr).forEach((key) => {
       const value = attr[key];
 
       if (typeof value === 'function' || key === 'name') return;
-
       if (key === 'className') {
         element.className = value;
       } else if (key === 'required' && value === true) {
-        element.setAttribute('required', '');
+        element.setAttribute('required', 'true');
+      } else if (key === 'required' && value === false) {
+        element.removeAttribute('required', '');
       } else {
         element.setAttribute(key, value);
       }
@@ -185,7 +198,7 @@ export default class Form {
   }
 
   getFormDataObject() {
-    const formData = new FormData(this.container);
+    const formDataObject = new FormData(this.container);
     const data = {};
 
 
@@ -193,9 +206,9 @@ export default class Form {
       const key = field.key;
 
       if (field.type === 'checkbox') {
-        data[key] = formData.getAll(key);
+        data[key] = formDataObject.getAll(key);
       } else if (field.type !== 'submit' && field.type !== 'reset') {
-        data[key] = formData.get(key) || '';
+        data[key] = formDataObject.get(key) || '';
       }
     });
 
@@ -206,7 +219,6 @@ export default class Form {
       }
     });
 
-    console.log(data);
     return data;
   }
 
@@ -216,16 +228,14 @@ export default class Form {
       e.preventDefault();
       const data = this.getFormDataObject();
       if (this.editingId) {
-        data.id = this.editingId;
-      } 
+        data.userId = this.editingId;
+      }
       this.onSubmit(data);
       this.container.reset();
       this.editingId = null;
     });
   }
 
-
-  
 
   FormReset() {
     this.container.addEventListener('reset', () => {
@@ -235,7 +245,7 @@ export default class Form {
   }
 
   updateFormData(data) {
-    this.editingId = data.id;
+    this.editingId = data.userId;
     this.updateForm(data);
   }
 
@@ -246,7 +256,7 @@ export default class Form {
     const msgDiv = document.createElement('div');
     msgDiv.className = `form-message form-message-${type}`;
     msgDiv.textContent = message;
-    this.container.appendChild(msgDiv);
+    this.container.parentElement.insertBefore(msgDiv, this.container);
 
     setTimeout(() => {
       msgDiv.remove();
