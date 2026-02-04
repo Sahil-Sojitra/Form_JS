@@ -15,13 +15,36 @@ A lightweight, flexible JavaScript library for building dynamic forms with built
 ## Installation
 
 ```bash
-npm install dynamic-form-builder-js
+npm install @sahil_sojitra_007/dynamic-form-builder-js
 ```
+
+**⚠️ Important:** This is a **browser-only** library that requires DOM APIs. It will not work in Node.js server-side code.
 
 ## Quick Start
 
+### Step 1: Create HTML File
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Form App</title>
+</head>
+<body>
+    <div id="myFormContainer">
+        <form id="myForm"></form>
+    </div>
+    <div id="myTable"></div>
+    
+    <script type="module" src="app.js"></script>
+</body>
+</html>
+```
+
+### Step 2: Create JavaScript File (app.js)
+
 ```javascript
-import { Form, Storage, Table } from 'dynamic-form-builder-js';
+import { Form, Storage, Table } from '@sahil_sojitra_007/dynamic-form-builder-js';
 
 // Define your form fields
 const formConfig = [
@@ -248,6 +271,38 @@ Works in all modern browsers that support:
 - ES6 Modules
 - localStorage
 - FormData API
+
+**⚠️ This library requires a browser environment and will NOT work in:**
+- Node.js server-side code
+- Server-Side Rendering (SSR) during build time
+- Backend APIs
+
+## Common Issues & Solutions
+
+### ❌ Issue: "Cannot use import statement outside a module"
+**✅ Solution:** Add `type="module"` to your script tag:
+```html
+<script type="module" src="app.js"></script>
+```
+
+### ❌ Issue: Package not found after installation
+**✅ Solution:** Use the correct scoped package name:
+```javascript
+import { Form, Storage, Table } from '@sahil_sojitra_007/dynamic-form-builder-js';
+```
+
+### ❌ Issue: "document is not defined" / "window is not defined"
+**✅ Solution:** This is a browser-only library. If using Next.js/React:
+```javascript
+'use client'; // Next.js
+import { Form, Storage, Table } from '@sahil_sojitra_007/dynamic-form-builder-js';
+```
+
+### ❌ Issue: Form not appearing
+**✅ Solution:**
+1. Ensure container exists: `<form id="myForm"></form>`
+2. Check browser console for errors
+3. Verify IDs match between HTML and JavaScript
 
 ## License
 
