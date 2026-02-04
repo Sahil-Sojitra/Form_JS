@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Package</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .form-message { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .form-message-success { background: #d4edda; color: #155724; }
+        .form-message-error { background: #f8d7da; color: #721c24; }
+        input, select, textarea { width: 100%; padding: 8px; margin: 5px 0; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Package Test</h1>
+        <form id="testForm"></form>
+        <div id="tableDiv"></div>
+    </div>
+
+    <script type="module">
+        import { Form, Storage, Table } from '@sahil_sojitra_007/dynamic-form-builder-js';
+
+        const formConfig = [
+            {
+                type: 'hidden',
+                key: 'userId',
+                getValue: function(obj) {
+                    return obj.userId || Math.floor(100000 + Math.random() * 900000);
+                }
+            },
+            {
+                type: 'text',
+                label: 'Name',
+                key: 'name',
+                attr: {
+                    required: true,
+                    placeholder: 'Enter your name'
+                }
+            },
+            {
+                type: 'email',
+                label: 'Email',
+                key: 'email',
+                attr: {
+                    required: true,
+                    placeholder: 'Enter your email'
+                }
+            },
+            {
+                type: 'submit',
+                attr: {
+                    value: 'Submit'
+                }
+            },
+            {
+                type: 'reset',
+                attr: {
+                    value: 'Reset'
+                }
+            }
+        ];
+
+        const form = new Form('testForm', formConfig, {
+            onSubmit: (data) => {
+                if (data.userId === form.editingId) {
+                    storage.updateEmployeeData(data);
+                    form.showMessage('Updated successfully!', 'success');
+                } else {
+                    storage.addEmployeeData(data);
+                    form.showMessage('Added successfully!', 'success');
+                }
+            }
+        });
+
+        const storage = new Storage('testData', {
+            onDataChange: (data) => {
+                table.render(data);
+            }
+        });
+
+        const table = new Table('tableDiv', {
+            onDelete: (id) => {
+                storage.deleteEmployeeData(id);
+                form.showMessage('Deleted!', 'error');
+            },
+            onUpdate: (data) => {
+                form.updateFormData(data);
+            }
+        });
+
+        table.render(storage.getAllEmployeeData());
+        console.log('✅ Package loaded successfully!');
+    </script>
+</body>
+</html>

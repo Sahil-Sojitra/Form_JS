@@ -22,13 +22,18 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/dynamic-form-builder-js.git"
+    "url": "https://github.com/Sahil-Sojitra/Form_JS"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/dynamic-form-builder-js/issues"
+    "url": "https://github.com/Sahil-Sojitra/Form_JS/issues"
   },
+<<<<<<< HEAD
   "homepage": "https://github.com/yourusername/dynamic-form-builder-js#readme",
   "author": "Your Name sahil_sojitra_007",
+=======
+  "homepage": "https://github.com/Sahil-Sojitra/Form_JS",
+  "author": "Your Name Sahil_Sojitra",
+>>>>>>> 95f361541fd3d605056c39d49a9ba900ea4f486a
   "license": "MIT",
   "files": [
     "index.js",
