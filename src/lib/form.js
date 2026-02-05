@@ -1,18 +1,7 @@
 import { sanitizeHTML, validateFieldConfig } from './utils.js';
 
-/**
- * Form class for dynamic form generation and management
- * @class
- */
 export default class Form {
-  /**
-   * Create a Form instance
-   * @param {string} formContainerId - ID of the form container element
-   * @param {Array} formData - Array of field configuration objects
-   * @param {Object} callbacks - Callback functions {onSubmit, onReset}
-   */
   constructor(formContainerId, formData, callbacks = {}) {
-    // Validate inputs
     if (!formContainerId || typeof formContainerId !== 'string') {
       throw new Error('Form: formContainerId must be a non-empty string');
     }
@@ -32,19 +21,14 @@ export default class Form {
     this.fields = [];
     this.editingId = null;
     this.formState = {};
-    this.eventListeners = []; // Track listeners for cleanup
+    this.eventListeners = [];
 
-    // Validate and set callbacks
     this.onSubmit = typeof callbacks.onSubmit === 'function' ? callbacks.onSubmit : () => { };
     this.onReset = typeof callbacks.onReset === 'function' ? callbacks.onReset : () => { };
 
     this.initialize();
   }
 
-  /**
-   * Initialize the form
-   * @private
-   */
   initialize() {
     try {
       this.validateInputs();
@@ -57,16 +41,11 @@ export default class Form {
     }
   }
 
-  /**
-   * Validate form inputs
-   * @private
-   */
   validateInputs() {
     const invalidFields = this.formData.filter(field => !validateFieldConfig(field));
 
     if (invalidFields.length > 0) {
       console.warn('Invalid field configurations found:', invalidFields);
-      // Filter out invalid fields
       this.formData = this.formData.filter(field => validateFieldConfig(field));
     }
 
@@ -75,10 +54,6 @@ export default class Form {
     }
   }
 
-  /**
-   * Separate hidden fields from visible fields
-   * @private
-   */
   separateFormField() {
     this.formData.forEach((field) => {
       if (field.type === 'hidden') {
@@ -89,10 +64,6 @@ export default class Form {
     });
   }
 
-  /**
-   * Loop through and create all input fields
-   * @private
-   */
   loopingAllInputFields() {
     this.fields.forEach((field) => {
       try {
@@ -103,11 +74,6 @@ export default class Form {
     });
   }
 
-  /**
-   * Create a single input field
-   * @private
-   * @param {Object} field - Field configuration
-   */
   createInputField(field) {
     let ele;
 
@@ -143,10 +109,6 @@ export default class Form {
     }
   }
 
-  /**
-   * Create textarea element
-   * @private
-   */
   createTextarea(field) {
     const ele = document.createElement('textarea');
     ele.name = field.key;
@@ -154,10 +116,6 @@ export default class Form {
     return ele;
   }
 
-  /**
-   * Create select element
-   * @private
-   */
   createSelect(field) {
     const ele = document.createElement('select');
     ele.name = field.key;
@@ -175,10 +133,6 @@ export default class Form {
     return ele;
   }
 
-  /**
-   * Create checkbox group
-   * @private
-   */
   createCheckboxGroup(field) {
     const container = document.createElement('div');
     container.className = 'checkbox-group';
@@ -211,10 +165,6 @@ export default class Form {
     return container;
   }
 
-  /**
-   * Create radio group
-   * @private
-   */
   createRadioGroup(field) {
     const container = document.createElement('div');
     container.className = 'radio-group';
@@ -247,10 +197,6 @@ export default class Form {
     return container;
   }
 
-  /**
-   * Create button element
-   * @private
-   */
   createButton(field) {
     const ele = document.createElement('button');
     ele.type = field.type;
@@ -259,10 +205,6 @@ export default class Form {
     return ele;
   }
 
-  /**
-   * Create input element
-   * @private
-   */
   createInput(field) {
     const ele = document.createElement('input');
     ele.type = field.type || 'text';
@@ -271,10 +213,6 @@ export default class Form {
     return ele;
   }
 
-  /**
-   * Append field to form with label
-   * @private
-   */
   appendFieldToForm(field, element) {
     if (field.label) {
       const wrapper = document.createElement('div');
@@ -292,17 +230,12 @@ export default class Form {
     }
   }
 
-  /**
-   * Apply attributes to element safely
-   * @private
-   */
   applyAttributes(element, attr) {
     if (!attr || typeof attr !== 'object') {
       element.className = 'default_input';
       return;
     }
 
-    // Set default class if not provided
     if (!attr.className) {
       element.className = 'default_input';
     }
@@ -310,7 +243,6 @@ export default class Form {
     Object.keys(attr).forEach((key) => {
       const value = attr[key];
 
-      // Skip functions and name (handled separately)
       if (typeof value === 'function' || key === 'name') return;
 
       switch (key) {
@@ -327,11 +259,9 @@ export default class Form {
           break;
 
         case 'value':
-          // Don't set value attribute for buttons
           break;
 
         default:
-          // Sanitize string values
           if (typeof value === 'string') {
             element.setAttribute(key, value);
           } else if (typeof value === 'number' || typeof value === 'boolean') {
@@ -342,10 +272,6 @@ export default class Form {
     });
   }
 
-  /**
-   * Update form with data
-   * @param {Object} data - Data to populate form
-   */
   updateForm(data) {
     if (!data || typeof data !== 'object') {
       console.warn('Form: Invalid data provided to updateForm');
@@ -389,22 +315,17 @@ export default class Form {
     });
   }
 
-  /**
-   * Get form data as object
-   * @returns {Object} Form data
-   */
   getFormDataObject() {
     const formDataObject = new FormData(this.container);
     const data = {};
 
-    // Process visible fields
     this.fields.forEach((field) => {
       const key = field.key;
 
       try {
         if (field.type === 'checkbox') {
           const values = formDataObject.getAll(key);
-          data[key] = values.filter(v => v !== ''); // Filter empty values
+          data[key] = values.filter(v => v !== '');
         } else if (field.type !== 'submit' && field.type !== 'reset') {
           data[key] = formDataObject.get(key) || '';
         }
@@ -414,7 +335,6 @@ export default class Form {
       }
     });
 
-    // Process hidden fields
     this.hiddenFields.forEach((field) => {
       try {
         if (typeof field.getValue === 'function') {
@@ -430,12 +350,7 @@ export default class Form {
     return data;
   }
 
-  /**
-   * Attach form event handlers
-   * @private
-   */
   attachFormHandlers() {
-    // Submit handler
     const submitHandler = (e) => {
       e.preventDefault();
 
@@ -456,7 +371,6 @@ export default class Form {
       }
     };
 
-    // Reset handler
     const resetHandler = () => {
       this.editingId = null;
       this.formState = {};
@@ -466,17 +380,12 @@ export default class Form {
     this.container.addEventListener('submit', submitHandler);
     this.container.addEventListener('reset', resetHandler);
 
-    // Track listeners for cleanup
     this.eventListeners.push(
       { element: this.container, event: 'submit', handler: submitHandler },
       { element: this.container, event: 'reset', handler: resetHandler }
     );
   }
 
-  /**
-   * Update form with data for editing
-   * @param {Object} data - Data to edit
-   */
   updateFormData(data) {
     if (!data || !data.userId) {
       console.warn('Form: Invalid data provided to updateFormData');
@@ -487,29 +396,20 @@ export default class Form {
     this.updateForm(data);
   }
 
-  /**
-   * Show message to user
-   * @param {string} message - Message text
-   * @param {string} type - Message type ('success' or 'error')
-   */
   showMessage(message, type = 'success') {
     if (!this.container.parentElement) return;
 
-    // Remove existing message
     const existingMsg = this.container.parentElement.querySelector('.form-message');
     if (existingMsg) {
       existingMsg.remove();
     }
 
-    // Create new message
     const msgDiv = document.createElement('div');
     msgDiv.className = `form-message form-message-${type}`;
     msgDiv.textContent = message;
 
-    // Insert before form
     this.container.parentElement.insertBefore(msgDiv, this.container);
 
-    // Auto-remove after 3 seconds
     setTimeout(() => {
       if (msgDiv.parentElement) {
         msgDiv.remove();
@@ -517,31 +417,22 @@ export default class Form {
     }, 3000);
   }
 
-  /**
-   * Reset form to initial state
-   */
   reset() {
     this.container.reset();
     this.editingId = null;
     this.formState = {};
   }
 
-  /**
-   * Destroy form and cleanup
-   */
   destroy() {
-    // Remove event listeners
     this.eventListeners.forEach(({ element, event, handler }) => {
       element.removeEventListener(event, handler);
     });
 
-    // Clear references
     this.eventListeners = [];
     this.formData = [];
     this.hiddenFields = [];
     this.fields = [];
 
-    // Clear container
     if (this.container) {
       this.container.innerHTML = '';
     }

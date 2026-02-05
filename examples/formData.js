@@ -1,4 +1,3 @@
-// When user bind any event like click, onChange, onblur all callback will have [e, obj, array, dataObjArray] arguments.
 const formData = [
   {
     type: 'hidden',
@@ -6,9 +5,6 @@ const formData = [
     label: 'User Id',
     unique: true,
     getValue: function (obj) {
-      // when user will use type hidden in formData object at that time we don't have to add any input element in form but we should notify or give error to user in console if user has not mentioned getValue function.
-      // getValue function will only have current form data in form of object key value pair
-      // first condition is to check if userId is present then use it because we only want to set userId for new records
       return obj.userId || Math.floor(100000 + Math.random() * 900000);
     },
   },
@@ -17,7 +13,6 @@ const formData = [
     key: 'createdAt',
     label: 'Created At',
     getValue: function (obj) {
-      // first condition is to check if createdAt is present then use it as we only want to set createdAt while creating new records
       return obj.createdAt || new Date().getTime();
     },
   },
@@ -26,14 +21,13 @@ const formData = [
     label: 'Name',
     key: 'name',
     value: '',
-    // attr is option, User can add new html element properties to it or user can remove all properties like empty object  attr: {}
-    attr: { 
+    attr: {
       id: 'txtName1',
       className: 'form-control textInput',
       placeholder: 'Enter name',
       name: 'txtName',
       required: true,
-      onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+      onchange: function () { },
     },
   },
   {
@@ -47,7 +41,7 @@ const formData = [
       placeholder: 'Enter email',
       name: 'txtName',
       required: true,
-      onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+      onchange: function () { },
     },
   },
   {
@@ -55,8 +49,8 @@ const formData = [
     label: 'Phone',
     key: 'phone',
     value: '',
-    attr:{
-      required:true,
+    attr: {
+      required: true,
     }
   },
   {
@@ -70,8 +64,8 @@ const formData = [
       placeholder: 'Enter Address',
       rows: '5',
       name: 'txtName',
-      required: true, //Add validation for required field
-      onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+      required: true,
+      onchange: function () { },
     },
   },
   {
@@ -85,7 +79,7 @@ const formData = [
       placeholder: 'Enter Street Address',
       name: 'txtName',
       required: true,
-      onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+      onchange: function () { },
     },
   },
   {
@@ -99,7 +93,7 @@ const formData = [
       placeholder: 'Enter City',
       name: 'txtName',
       required: true,
-      onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+      onchange: function () { },
     },
   },
   {
@@ -107,13 +101,13 @@ const formData = [
     label: 'State',
     key: 'state',
     value: '',
-    attr: { 
+    attr: {
       id: 'txtState',
       className: 'form-control textInput',
       placeholder: 'Enter State',
       name: 'txtName',
       required: true,
-      onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+      onchange: function () { },
     },
   },
   {
@@ -127,7 +121,7 @@ const formData = [
       placeholder: 'Enter Pin Code',
       name: 'txtName',
       required: true,
-      onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+      onchange: function () { },
     },
   },
   {
@@ -140,7 +134,7 @@ const formData = [
       name: 'country',
       required: true,
       className: 'form-control columns',
-      onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+      onchange: function () { },
     },
     options: [
       {
@@ -175,7 +169,7 @@ const formData = [
           id: 'male',
           className: 'form-check-input radioGender',
           required: true,
-          onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+          onchange: function () { },
         },
       },
       {
@@ -186,7 +180,7 @@ const formData = [
           id: 'female',
           className: 'form-check-input radioGender',
           required: true,
-          onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+          onchange: function () { },
         },
       },
     ],
@@ -204,7 +198,7 @@ const formData = [
         attr: {
           id: 'swimming',
           className: 'form-check-input radioHobbies',
-          onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+          onchange: function () { },
         },
       },
       {
@@ -214,7 +208,7 @@ const formData = [
         attr: {
           id: 'singing',
           className: 'form-check-input radioHobbies',
-          onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+          onchange: function () { },
         },
       },
       {
@@ -224,7 +218,7 @@ const formData = [
         attr: {
           id: 'writing',
           className: 'form-check-input radioHobbies',
-          onchange: function () {}, // e, obj, array, dataObjArray you will get in function argument
+          onchange: function () { },
         },
       },
     ],
@@ -236,9 +230,6 @@ const formData = [
       name: 'btnSubmit',
       className: 'btn btn-block btn-primary submit',
       value: 'Submit',
-      onclick: function () {
-
-      },
     },
   },
   {
@@ -248,7 +239,7 @@ const formData = [
       name: 'btnReset',
       className: 'btn btn-block btn-primary reset',
       value: 'Reset',
-      onclick: function () {}, // e, obj, array, dataObjArray you will get in function argument
+      onclick: function () { },
     },
   },
 ];

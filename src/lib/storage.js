@@ -1,15 +1,6 @@
 import { safeJSONParse, validateStorageData, deepClone } from './utils.js';
 
-/**
- * Storage class for localStorage management
- * @class
- */
 export default class Storage {
-    /**
-     * Create a Storage instance
-     * @param {string} storageId - localStorage key
-     * @param {Object} callbacks - Callback functions {onDataChange}
-     */
     constructor(storageId, callbacks = {}) {
         if (!storageId || typeof storageId !== 'string') {
             throw new Error('Storage: storageId must be a non-empty string');
@@ -22,10 +13,6 @@ export default class Storage {
         this.initialize();
     }
 
-    /**
-     * Initialize storage
-     * @private
-     */
     initialize() {
         try {
             this.employees = this.loadFromStorage();
@@ -35,10 +22,6 @@ export default class Storage {
         }
     }
 
-    /**
-     * Load data from localStorage with validation
-     * @returns {Array} Stored data or empty array
-     */
     loadFromStorage() {
         try {
             const data = localStorage.getItem(this.storageId);
@@ -49,7 +32,6 @@ export default class Storage {
 
             const parsed = safeJSONParse(data, []);
 
-            // Validate data structure
             if (!validateStorageData(parsed)) {
                 console.warn('Storage: Invalid data structure detected, resetting to empty array');
                 return [];
@@ -62,17 +44,12 @@ export default class Storage {
         }
     }
 
-    /**
-     * Save data to localStorage with error handling
-     * @returns {boolean} Success status
-     */
     saveToStorage() {
         try {
             const jsonString = JSON.stringify(this.employees);
             localStorage.setItem(this.storageId, jsonString);
             return true;
         } catch (error) {
-            // Handle quota exceeded error
             if (error.name === 'QuotaExceededError') {
                 console.error('Storage: localStorage quota exceeded');
                 this.handleQuotaExceeded();
@@ -83,28 +60,14 @@ export default class Storage {
         }
     }
 
-    /**
-     * Handle quota exceeded situation
-     * @private
-     */
     handleQuotaExceeded() {
-        // Could implement cleanup strategy here
         console.warn('Storage: Consider reducing data or implementing pagination');
     }
 
-    /**
-     * Get all employee data (returns copy to prevent direct mutation)
-     * @returns {Array} Copy of employee data
-     */
     getAllEmployeeData() {
         return deepClone(this.employees);
     }
 
-    /**
-     * Add employee data with validation
-     * @param {Object} employeeData - Employee data to add
-     * @returns {boolean} Success status
-     */
     addEmployeeData(employeeData) {
         if (!employeeData || typeof employeeData !== 'object') {
             console.error('Storage: Invalid employee data provided');
@@ -112,7 +75,6 @@ export default class Storage {
         }
 
         try {
-            // Create a clean copy
             const cleanData = deepClone(employeeData);
 
             this.employees.push(cleanData);
@@ -122,7 +84,6 @@ export default class Storage {
                 return true;
             }
 
-            // Rollback on save failure
             this.employees.pop();
             return false;
         } catch (error) {
@@ -131,11 +92,6 @@ export default class Storage {
         }
     }
 
-    /**
-     * Delete employee data by userId
-     * @param {string|number} userId - User ID to delete
-     * @returns {boolean} Success status
-     */
     deleteEmployeeData(userId) {
         if (userId === undefined || userId === null) {
             console.error('Storage: Invalid userId provided for deletion');
@@ -148,7 +104,6 @@ export default class Storage {
 
             this.employees = this.employees.filter((emp) => emp.userId !== userId);
 
-            // Check if any record was deleted
             if (this.employees.length === originalLength) {
                 console.warn(`Storage: No employee found with userId: ${userId}`);
                 return false;
@@ -159,7 +114,6 @@ export default class Storage {
                 return true;
             }
 
-            // Rollback on save failure
             this.employees = originalData;
             return false;
         } catch (error) {
@@ -168,11 +122,6 @@ export default class Storage {
         }
     }
 
-    /**
-     * Update employee data
-     * @param {Object} employeeData - Updated employee data
-     * @returns {boolean} Success status
-     */
     updateEmployeeData(employeeData) {
         if (!employeeData || typeof employeeData !== 'object' || !employeeData.userId) {
             console.error('Storage: Invalid employee data provided for update');
@@ -197,7 +146,6 @@ export default class Storage {
                 return true;
             }
 
-            // Rollback on save failure
             this.employees[index] = originalData;
             return false;
         } catch (error) {
@@ -206,11 +154,6 @@ export default class Storage {
         }
     }
 
-    /**
-     * Find employee by userId
-     * @param {string|number} userId - User ID to find
-     * @returns {Object|null} Employee data or null
-     */
     findById(userId) {
         if (userId === undefined || userId === null) {
             return null;
@@ -220,10 +163,6 @@ export default class Storage {
         return employee ? deepClone(employee) : null;
     }
 
-    /**
-     * Clear all data
-     * @returns {boolean} Success status
-     */
     clear() {
         try {
             this.employees = [];
@@ -236,10 +175,6 @@ export default class Storage {
         }
     }
 
-    /**
-     * Get storage size in bytes
-     * @returns {number} Size in bytes
-     */
     getSize() {
         try {
             const data = localStorage.getItem(this.storageId);
@@ -250,10 +185,6 @@ export default class Storage {
         }
     }
 
-    /**
-     * Export data as JSON string
-     * @returns {string} JSON string
-     */
     exportData() {
         try {
             return JSON.stringify(this.employees, null, 2);
@@ -263,11 +194,6 @@ export default class Storage {
         }
     }
 
-    /**
-     * Import data from JSON string
-     * @param {string} jsonString - JSON string to import
-     * @returns {boolean} Success status
-     */
     importData(jsonString) {
         try {
             const data = safeJSONParse(jsonString, null);
@@ -285,7 +211,6 @@ export default class Storage {
                 return true;
             }
 
-            // Rollback on failure
             this.employees = originalData;
             return false;
         } catch (error) {
