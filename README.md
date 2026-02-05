@@ -27,17 +27,17 @@ npm install @sahil_sojitra_007/dynamic-form-builder-js
 ```html
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>My Form App</title>
-</head>
-<body>
+  </head>
+  <body>
     <div id="myFormContainer">
-        <form id="myForm"></form>
+      <form id="myForm"></form>
     </div>
     <div id="myTable"></div>
-    
+
     <script type="module" src="app.js"></script>
-</body>
+  </body>
 </html>
 ```
 
@@ -273,6 +273,7 @@ Works in all modern browsers that support:
 - FormData API
 
 **⚠️ This library requires a browser environment and will NOT work in:**
+
 - Node.js server-side code
 - Server-Side Rendering (SSR) during build time
 - Backend APIs
@@ -280,26 +281,34 @@ Works in all modern browsers that support:
 ## Common Issues & Solutions
 
 ### ❌ Issue: "Cannot use import statement outside a module"
+
 **✅ Solution:** Add `type="module"` to your script tag:
+
 ```html
 <script type="module" src="app.js"></script>
 ```
 
 ### ❌ Issue: Package not found after installation
+
 **✅ Solution:** Use the correct scoped package name:
+
 ```javascript
 import { Form, Storage, Table } from '@sahil_sojitra_007/dynamic-form-builder-js';
 ```
 
 ### ❌ Issue: "document is not defined" / "window is not defined"
+
 **✅ Solution:** This is a browser-only library. If using Next.js/React:
+
 ```javascript
 'use client'; // Next.js
 import { Form, Storage, Table } from '@sahil_sojitra_007/dynamic-form-builder-js';
 ```
 
 ### ❌ Issue: Form not appearing
+
 **✅ Solution:**
+
 1. Ensure container exists: `<form id="myForm"></form>`
 2. Check browser console for errors
 3. Verify IDs match between HTML and JavaScript
@@ -314,7 +323,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Author
 
-Your Name
+Sahil Sojitra
 
 ## Changelog
 

@@ -1,6 +1,6 @@
 {
-  "name": "@sahil_sojitra_007/dynamic-form-builder-js",
-  "version": "1.1.0",
+  "name": "@sahil_sopjitra_007/dynamic-form-builder-js",
+  "version": "1.0.1",
   "description": "A lightweight, flexible JavaScript library for building dynamic forms with built-in table rendering and localStorage management",
   "main": "index.js",
   "type": "module",
@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Sahil-Sojitra/Form_JS"
+    "url": "git+https://github.com/Sahil-Sojitra/Form_JS.git"
   },
   "bugs": {
     "url": "https://github.com/Sahil-Sojitra/Form_JS/issues"
