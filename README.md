@@ -293,7 +293,7 @@ Works in all modern browsers that support:
 **✅ Solution:** Use the correct scoped package name:
 
 ```javascript
-import { Form, Storage, Table } from '@sahil_sojitra_007/dynamic-form-builder-js';
+import { Form, Storage, Table } from './node_modules/@sahil_sojitra_007/dynamic-form-builder-js';
 ```
 
 ### ❌ Issue: "document is not defined" / "window is not defined"
@@ -302,7 +302,7 @@ import { Form, Storage, Table } from '@sahil_sojitra_007/dynamic-form-builder-js
 
 ```javascript
 'use client'; // Next.js
-import { Form, Storage, Table } from '@sahil_sojitra_007/dynamic-form-builder-js';
+import { Form, Storage, Table } from './node_modules/@sahil_sojitra_007/dynamic-form-builder-js';
 ```
 
 ### ❌ Issue: Form not appearing
